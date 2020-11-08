@@ -1,1 +1,13 @@
-"# calculate_sleeping_hours" 
+# calculate_sleeping_hours
+
+LINEで`就寝`・`起床`とそれぞれ入力すると睡眠時間を計算して記録するボットです。
+
+リマインドを追加しておくと、`就寝`と入力したときに、寝る前にやっておくことを確認してくれます。
+
+<img src="img/fall_asleep.png" height="450">
+
+`起床`を入力すると、睡眠時間を報告してくれます。
+
+<img src="img/fall_asleep.png" height="450">
+
+何時までをその日とみなすかを設定でき、その範囲内であれば、`就寝-起床`は何回でも記録できます。
