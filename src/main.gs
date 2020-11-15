@@ -1,3 +1,5 @@
+var properties = PropertiesService.getScriptProperties();
+
 /**
  * Postを実行する
  * @param {JSON} e
@@ -6,34 +8,62 @@
 function doPost(e) {
 
     let replyToken = JSON.parse(e.postData.contents).events[0].replyToken;
-    let userMessage = JSON.parse(e.postData.contents).events[0].message.text;
+    let eventType = JSON.parse(e.postData.contents).events[0].type;
 
-    let replyMessage = convertUserMessageToReplyMessage(messageValidation(userMessage));
-
-    setAsPreviousMessage(userMessage);
+    if (eventType === 'postback') {
+        replyMessage = handlePostBack(e);
+    } else {
+        replyMessage = handleUserMessage(e);
+    }
 
     UrlFetchApp.fetch(config.REPLY_URL, createReplyRequest(replyToken, replyMessage));
-
 
     return ContentService.createTextOutput(JSON.stringify({ content: 'post ok' })).setMimeType(ContentService.MimeType.JSON);
 }
 
+const handleUserMessage = (e) => {
+
+    let userMessage = JSON.parse(e.postData.contents).events[0].message.text;
+    let lastMessage = properties.getProperty('lastMessage');
+    let beforeLastMessage = properties.getProperty('beforeLastMessage');
+
+    let replyMessage = convertUserMessageToReplyMessage(messageValidation(beforeLastMessage, lastMessage, userMessage));
+
+    setLastMessage(userMessage);
+
+    return replyMessage;
+}
+
+const handlePostBack = (e) => {
+    let postbackData = JSON.parse(e.postData.contents).events[0].postback.data;
+    let text;
+
+    if (postbackData === 'date') {
+        text = JSON.parse(e.postData.contents).events[0].postback.params.date
+    } else {
+        text = postbackData;
+    }
+
+    return [
+        {
+            "type":"text",
+            "text": text
+        }
+    ];
+}
+
+
 /**
  * 入力メッセージの検証
- * @param {String} userMessage 入力されたメッセージ
+ * @param {String} beforeLastMessage 前の前に入力されたメッセージ
+ * @param {String} lastMessage       前に入力されたメッセージ
+ * @param {String} userMessage       入力されたメッセージ
  * @return {String}
  */
-const messageValidation = (userMessage) => {
+const messageValidation = (beforeLastMessage, lastMessage, userMessage) => {
 
-
-    // この部分を関数化してテストコードも書く
-    //----------------------------------------------------------
   　// 全角空白を半角空白へ
   　userMessage = userMessage.replace(/　/g, ' ');
-
-    // 全ての改行コードを無くす=>使えない
-    userMessage.replace(/\r\n|\n|\r/g, '');
-    //----------------------------------------------------------
 
     let messageList = userMessage.split(' ');
     let messageLength = messageList.length;
@@ -91,10 +121,7 @@ const createReplyRequest = (replyToken, replyMessage) => {
       'method': 'post',
       'payload': JSON.stringify({
         'replyToken': replyToken,
-        'messages': [{
-            'type': 'text',
-            'text': replyMessage,
-        }],
+        'messages': replyMessage,
       }),
     }
   }
