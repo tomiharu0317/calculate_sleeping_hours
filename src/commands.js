@@ -18,14 +18,84 @@ const goToBed = () => {
  * 確認する関数
  */
 const confirm = () => {
-    return '確認[日付、週間]';
+    return [
+        {
+          "type": "flex",
+          "altText": "This is a Flex Message",
+          "contents": {
+            "type": "bubble",
+            "body": {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                {
+                  "type": "button",
+                  "action": {
+                    "type": "datetimepicker",
+                    "label": "日付",
+                    "data": "date",
+                    "mode": "date"
+                  }
+                },
+                {
+                  "type": "button",
+                  "action": {
+                    "type": "postback",
+                    "label": "週間",
+                    "data": "weekly"
+                    // "displayText": "週間"
+                  }
+                }
+              ]
+            }
+          }
+        }
+    ];
 }
 
 /**
  * リマインドを設定する関数
  */
 const remind = () => {
-    return 'リマインド[追加、削除、一覧]';
+    return [
+        {
+          "type": "flex",
+          "altText": "This is a Flex Message",
+          "contents": {
+            "type": "bubble",
+            "body": {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                {
+                  "type": "button",
+                  "action": {
+                    "type": "postback",
+                    "label": "追加",
+                    "data": "add"
+                  },
+                },
+                {
+                  "type": "button",
+                  "action": {
+                    "type": "postback",
+                    "label": "削除",
+                    "data": "delete"
+                  },
+                },
+                {
+                  "type": "button",
+                  "action": {
+                    "type": "postback",
+                    "label": "一覧",
+                    "data": "showAll"
+                  }
+                }
+              ]
+            }
+          }
+        }
+    ];
 }
 
 /**
