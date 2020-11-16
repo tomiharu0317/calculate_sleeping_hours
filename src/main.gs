@@ -9,6 +9,7 @@ function doPost(e) {
 
     let replyToken = JSON.parse(e.postData.contents).events[0].replyToken;
     let eventType = JSON.parse(e.postData.contents).events[0].type;
+    let replyMessage;
 
     if (eventType === 'postback') {
         replyMessage = handlePostBack(e);
