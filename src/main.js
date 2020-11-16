@@ -9,6 +9,7 @@ function doPost(e) {
 
     let replyToken = JSON.parse(e.postData.contents).events[0].replyToken;
     let eventType = JSON.parse(e.postData.contents).events[0].type;
+    let replyMessage;
 
     if (eventType === 'postback') {
         replyMessage = handlePostBack(e);
@@ -43,6 +44,11 @@ const handlePostBack = (e) => {
     } else {
         text = postbackData;
     }
+
+    return arrangeMessageFormat(text);
+}
+
+const arrangeMessageFormat = (text) => {
 
     return [
         {
@@ -112,7 +118,7 @@ function header() {
 /**
  * 応答用のリクエスト情報（JSON）を作成する
  * @param {String} replyToken - WebHookで受信した応答用Token（LINE BOTより）
- * @param {String} - message情報
+ * @param {String} replyMessage - message情報
  * @return {Object} リクエスト情報（JSON）
  */
 const createReplyRequest = (replyToken, replyMessage) => {

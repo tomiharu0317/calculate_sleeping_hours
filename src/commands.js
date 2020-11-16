@@ -4,14 +4,18 @@ const commands = ['ヘルプ', '起床', '就寝', '確認', 'リマインド', 
  * 起床時間を記録する関数
  */
 const getUp = () => {
-    return '起床を記録しました。';
+
+    let text = '起床を記録しました。'
+    return arrangeMessageFormat(text);
 }
 
 /**
  * 就寝時間を記録する関数
  */
 const goToBed = () => {
-    return '就寝を記録しました。';
+
+    let text = '就寝を記録しました。'
+    return arrangeMessageFormat(text);
 }
 
 /**
@@ -102,12 +106,16 @@ const remind = () => {
  * お問い合わせ用のGoogle Form URLを送信する関数
  */
 const contact = () => {
-    return 'こちらのフォームからお問い合わせ下さい。（レビュー、使いにくい点など）';
+
+    let text = 'こちらのフォームからお問い合わせ下さい。（レビュー、使いにくい点など）'
+    return arrangeMessageFormat(text);
 }
 
 /**
  * ヘルプを表示する関数
  */
 const help = () => {
-    return 'ヘルプ。';
+
+    let text = 'ヘルプ'
+    return arrangeMessageFormat(text);
 }
