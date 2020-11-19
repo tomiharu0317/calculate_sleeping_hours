@@ -37,7 +37,7 @@ const getUp = () => {
       recordSheet.getRange(lastRow, targetColumn, 5, 2).setValues(values);
     }
 
-    text = '起床を記録しました。'
+    text = 'おはようございます\n\n睡眠時間は' + sleepingHours + 'でした';
   }
 
   return arrangeMessageFormat(text);
@@ -90,7 +90,7 @@ const goToBed = () => {
 
     // reminder();
 
-    text = '就寝を記録しました。'
+    text = 'おやすみなさい💤';
   }
 
   return arrangeMessageFormat(text);
