@@ -37,7 +37,7 @@ const getUp = () => {
       recordSheet.getRange(lastRow, targetColumn, 5, 2).setValues(values);
     }
 
-    text = '起床を記録しました。'
+    text = 'おはようございます\n\n睡眠時間は' + sleepingHours + 'でした';
   }
 
   return arrangeMessageFormat(text);
@@ -56,7 +56,7 @@ const calcTotalSleepingHours = (sleepingHours, recordNum, targetColumn) => {
     for (let k = 1; k < recordNum + 1; k++) {
       // [['08:43']];
 
-      // date型で持ってくるからsplit()できない [ [ Sat Dec 30 1899 12:34:00 GMT+0900 (日本標準時) ] ]
+      // date型を文字列にしたやつで持ってくるからsplit()できない [ [ Sat Dec 30 1899 12:34:00 GMT+0900 (日本標準時) ] ]
       sleepingTimes = recordSheet.getRange(4*k, targetColumn+1).getValues();
       sleepingTimes = new Date(sleepingTimes[0][0]);
 
@@ -90,7 +90,7 @@ const goToBed = () => {
 
     // reminder();
 
-    text = '就寝を記録しました。'
+    text = 'おやすみなさい💤';
   }
 
   return arrangeMessageFormat(text);
