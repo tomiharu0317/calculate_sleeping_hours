@@ -11,6 +11,8 @@ function doPost(e) {
     let eventType = JSON.parse(e.postData.contents).events[0].type;
     let replyMessage;
 
+    userId.put(e);
+
     if (eventType === 'postback') {
         replyMessage = handlePostBack(e);
     } else {
@@ -48,16 +50,35 @@ const handlePostBack = (e) => {
     return arrangeMessageFormat(text);
 }
 
-const arrangeMessageFormat = (text) => {
+const setLastMessage = (userMessage) => {
+    var properties = PropertiesService.getScriptProperties();
 
-    return [
-        {
-            "type":"text",
-            "text": text
-        }
-    ];
+    let lastMessage = properties.getProperty('lastMessage');
+
+    properties.setProperty('beforeLastMessage', lastMessage);
+    properties.setProperty('lastMessage', userMessage);
+};
+
+/**
+ * ユーザーの入力メッセージからそれに対応したメッセージを返す
+ * @param {String}
+ */
+const convertUserMessageToReplyMessage = (message) => {
+
+    if (message === '起床') {
+        return getUp();
+    } else if (message === '就寝') {
+        return goToBed();
+    } else if (message === '確認') {　      //クイックリプライ[日付、週間]
+        return confirm();
+    } else if (message === 'リマインド') {  //クイックリプライ[追加、削除、一覧]
+        return remind();
+    } else if (message === 'お問い合わせ') {
+        return contact();
+    } else {
+        return help();
+    }
 }
-
 
 /**
  * 入力メッセージの検証
@@ -84,27 +105,6 @@ const messageValidation = (beforeLastMessage, lastMessage, userMessage) => {
 }
 
 /**
- * ユーザーの入力メッセージからそれに対応したメッセージを返す
- * @param {String}
- */
-const convertUserMessageToReplyMessage = (message) => {
-
-    if (message === '起床') {
-        return getUp();
-    } else if (message === '就寝') {
-        return goToBed();
-    } else if (message === '確認') {　      //クイックリプライ[日付、週間]
-        return confirm();
-    } else if (message === 'リマインド') {  //クイックリプライ[追加、削除、一覧]
-        return remind();
-    } else if (message === 'お問い合わせ') {
-        return contact();
-    } else {
-        return help();
-    }
-}
-
-/**
  * リクエストのヘッダーを作成
  * @return {Object} リクエスト情報のヘッダー
  */
@@ -127,7 +127,9 @@ const createReplyRequest = (replyToken, replyMessage) => {
       'method': 'post',
       'payload': JSON.stringify({
         'replyToken': replyToken,
-        'messages': replyMessage,
+        'messages': [
+            replyMessage
+        ],
       }),
     }
   }
