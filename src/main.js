@@ -11,6 +11,8 @@ function doPost(e) {
     let eventType = JSON.parse(e.postData.contents).events[0].type;
     let replyMessage;
 
+    userId.put(e);
+
     if (eventType === 'postback') {
         replyMessage = handlePostBack(e);
     } else {
@@ -21,6 +23,16 @@ function doPost(e) {
 
     return ContentService.createTextOutput(JSON.stringify({ content: 'post ok' })).setMimeType(ContentService.MimeType.JSON);
 }
+
+const userId = {
+    get() {
+      return properties.getProperty('sleep');
+    },
+    put(e) {
+      let userId = JSON.parse(e.postData.contents).events[0].source.userId;
+      properties.setProperty('userId', userId);
+    }
+};
 
 const handleUserMessage = (e) => {
 
@@ -131,3 +143,26 @@ const createReplyRequest = (replyToken, replyMessage) => {
       }),
     }
   }
+
+const push = (pushMessage) => {
+
+    const options = {
+        "method" : "POST",
+        "headers" : header(),
+        "payload" : JSON.stringify(postData(pushMessage)),
+    };
+
+    UrlFetchApp.fetch(config.PUSH_URL, options);
+}
+
+const postData = (pushMessage) => {
+    return {
+        "to" : properties.getProperty('userId'),
+        "messages" : [
+            {
+                "type" : "text",
+                "text" : pushMessage,
+            }
+        ]
+      };
+}
