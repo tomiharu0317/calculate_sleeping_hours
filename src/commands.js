@@ -37,10 +37,22 @@ const getUp = () => {
       recordSheet.getRange(lastRow, targetColumn, 5, 2).setValues(values);
     }
 
+    let cautionValues = arrangeTotalSleepingHoursFormat(totalSleepingHours);
+    cautionSheet.getRange(new Date().getDate(), 2).setValues(cautionValues);
+
     text = 'おはようございます\n\n睡眠時間は' + sleepingHours + 'でした';
   }
 
   return arrangeMessageFormat(text);
+}
+
+const arrangeTotalSleepingHoursFormat = (totalSleepingHours) => {
+  let cautionValues = [];
+  let list = totalSleepingHours.split(':');
+  let val  = list[0] + '時間' + list[1] + '分';
+  cautionValues.push([val]);
+
+  return cautionValues;
 }
 
 const calcTotalSleepingHours = (sleepingHours, recordNum, targetColumn) => {
