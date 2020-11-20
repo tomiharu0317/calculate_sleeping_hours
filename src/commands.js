@@ -46,47 +46,6 @@ const getUp = () => {
   return arrangeMessageFormat(text);
 }
 
-const arrangeTotalSleepingHoursFormat = (totalSleepingHours) => {
-  let cautionValues = [];
-  let list = totalSleepingHours.split(':');
-  let val  = list[0] + '時間' + list[1] + '分';
-  cautionValues.push([val]);
-
-  return cautionValues;
-}
-
-const calcTotalSleepingHours = (sleepingHours, recordNum, targetColumn) => {
-
-  if (recordNum === 0) {
-    return sleepingHours;
-  } else {
-    // '-----------------------------------------------------------------------------'
-    let totalHours   = Number(sleepingHours.split(':')[0]);
-    let totalMinutes = Number(sleepingHours.split(':')[1]);
-    let sleepingTimes;
-
-    for (let k = 1; k < recordNum + 1; k++) {
-      // [['08:43']];
-
-      // date型を文字列にしたやつで持ってくるからsplit()できない [ [ Sat Dec 30 1899 12:34:00 GMT+0900 (日本標準時) ] ]
-      sleepingTimes = recordSheet.getRange(4*k, targetColumn+1).getValues();
-      sleepingTimes = new Date(sleepingTimes[0][0]);
-
-      totalHours   += sleepingTimes.getHours();
-      totalMinutes += sleepingTimes.getMinutes();
-    }
-
-    totalHours   += Math.floor(totalMinutes / 60);
-    totalMinutes %= 60;
-
-    totalHours   = totalHours.toString().padStart(2, '0');
-    totalMinutes = totalMinutes.toString().padStart(2, '0');
-
-    return totalHours + ':' + totalMinutes;
-    // '-----------------------------------------------------------------------------'
-  }
-}
-
 /**
  * 就寝時間を記録する関数
  */
@@ -108,150 +67,104 @@ const goToBed = () => {
   return arrangeMessageFormat(text);
 }
 
-const arrangeTimeFormat = (time) => {
-  let hour = time.getHours().toString().padStart(2, '0');
-  let minite = time.getMinutes().toString().padStart(2, '0');
-
-  return hour + ':' + minite;
-}
-
-/**
- * 就寝時間と起床時間を受け取って、睡眠時間を吐く
- * @param {Object} gotobedTime
- * @param {Object} getupTime
- * @return {String}
- */
-const calcSleepingHours = (gotobedTime, getupTime) => {
-
-  let timeDiff = getupTime.getTime() - gotobedTime.getTime();
-
-  let sleepingMinutes = Math.floor(timeDiff / (1000 * 60));
-  let sleepingHours   = Math.floor(timeDiff / (1000 * 60 * 60));
-
-  let minites = Math.floor(((sleepingMinutes / 60) - sleepingHours) * 60);
-
-  sleepingHours = sleepingHours.toString().padStart(2, '0');
-  minites = minites.toString().padStart(2, '0');
-
-  return sleepingHours + ':' + minites;
-}
-
-const isSleep = {
-  get() {
-    return properties.getProperty('sleep');
-  },
-  put(bool) {
-    properties.setProperty('sleep', bool);
-  }
-};
-
-const bedtime = {
-  get() {
-    return properties.getProperty('bedtime');
-  },
-  put() {
-    properties.setProperty('bedtime', new Date().toString());
-  }
-};
-
 /**
  * 確認する関数
  */
 const confirm = () => {
-    return [
-        {
-          "type": "flex",
-          "altText": "This is a Flex Message",
-          "contents": {
-            "type": "bubble",
-            "body": {
-              "type": "box",
-              "layout": "horizontal",
-              "contents": [
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "datetimepicker",
-                    "label": "日付",
-                    "data": "date",
-                    "mode": "date"
-                  }
-                },
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "postback",
-                    "label": "週間",
-                    "data": "weekly"
-                    // "displayText": "週間"
-                  }
+  return [
+      {
+        "type": "flex",
+        "altText": "This is a Flex Message",
+        "contents": {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "button",
+                "action": {
+                  "type": "datetimepicker",
+                  "label": "日付",
+                  "data": "date",
+                  "mode": "date"
                 }
-              ]
-            }
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "postback",
+                  "label": "週間",
+                  "data": "weekly"
+                  // "displayText": "週間"
+                }
+              }
+            ]
           }
         }
-    ];
+      }
+  ];
 }
 
 /**
- * リマインドを設定する関数
- */
+* リマインドを設定する関数
+*/
 const remind = () => {
-    return [
-        {
-          "type": "flex",
-          "altText": "This is a Flex Message",
-          "contents": {
-            "type": "bubble",
-            "body": {
-              "type": "box",
-              "layout": "horizontal",
-              "contents": [
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "postback",
-                    "label": "追加",
-                    "data": "add"
-                  },
+  return [
+      {
+        "type": "flex",
+        "altText": "This is a Flex Message",
+        "contents": {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "button",
+                "action": {
+                  "type": "postback",
+                  "label": "追加",
+                  "data": "add"
                 },
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "postback",
-                    "label": "削除",
-                    "data": "delete"
-                  },
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "postback",
+                  "label": "削除",
+                  "data": "delete"
                 },
-                {
-                  "type": "button",
-                  "action": {
-                    "type": "postback",
-                    "label": "一覧",
-                    "data": "showAll"
-                  }
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "postback",
+                  "label": "一覧",
+                  "data": "showAll"
                 }
-              ]
-            }
+              }
+            ]
           }
         }
-    ];
+      }
+  ];
 }
 
 /**
- * お問い合わせ用のGoogle Form URLを送信する関数
- */
+* お問い合わせ用のGoogle Form URLを送信する関数
+*/
 const contact = () => {
 
-    let text = 'こちらのフォームからお問い合わせ下さい。（レビュー、使いにくい点など）'
-    return arrangeMessageFormat(text);
+  let text = 'こちらのフォームからお問い合わせ下さい。（レビュー、使いにくい点など）'
+  return arrangeMessageFormat(text);
 }
 
 /**
- * ヘルプを表示する関数
- */
+* ヘルプを表示する関数
+*/
 const help = () => {
 
-    let text = 'ヘルプ'
-    return arrangeMessageFormat(text);
+  let text = 'ヘルプ'
+  return arrangeMessageFormat(text);
 }
