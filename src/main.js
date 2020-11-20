@@ -24,16 +24,6 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({ content: 'post ok' })).setMimeType(ContentService.MimeType.JSON);
 }
 
-const userId = {
-    get() {
-      return properties.getProperty('sleep');
-    },
-    put(e) {
-      let userId = JSON.parse(e.postData.contents).events[0].source.userId;
-      properties.setProperty('userId', userId);
-    }
-};
-
 const handleUserMessage = (e) => {
 
     let userMessage = JSON.parse(e.postData.contents).events[0].message.text;
@@ -60,16 +50,35 @@ const handlePostBack = (e) => {
     return arrangeMessageFormat(text);
 }
 
-const arrangeMessageFormat = (text) => {
+const setLastMessage = (userMessage) => {
+    var properties = PropertiesService.getScriptProperties();
 
-    return [
-        {
-            "type":"text",
-            "text": text
-        }
-    ];
+    let lastMessage = properties.getProperty('lastMessage');
+
+    properties.setProperty('beforeLastMessage', lastMessage);
+    properties.setProperty('lastMessage', userMessage);
+};
+
+/**
+ * ユーザーの入力メッセージからそれに対応したメッセージを返す
+ * @param {String}
+ */
+const convertUserMessageToReplyMessage = (message) => {
+
+    if (message === '起床') {
+        return getUp();
+    } else if (message === '就寝') {
+        return goToBed();
+    } else if (message === '確認') {　      //クイックリプライ[日付、週間]
+        return confirm();
+    } else if (message === 'リマインド') {  //クイックリプライ[追加、削除、一覧]
+        return remind();
+    } else if (message === 'お問い合わせ') {
+        return contact();
+    } else {
+        return help();
+    }
 }
-
 
 /**
  * 入力メッセージの検証
@@ -96,27 +105,6 @@ const messageValidation = (beforeLastMessage, lastMessage, userMessage) => {
 }
 
 /**
- * ユーザーの入力メッセージからそれに対応したメッセージを返す
- * @param {String}
- */
-const convertUserMessageToReplyMessage = (message) => {
-
-    if (message === '起床') {
-        return getUp();
-    } else if (message === '就寝') {
-        return goToBed();
-    } else if (message === '確認') {　      //クイックリプライ[日付、週間]
-        return confirm();
-    } else if (message === 'リマインド') {  //クイックリプライ[追加、削除、一覧]
-        return remind();
-    } else if (message === 'お問い合わせ') {
-        return contact();
-    } else {
-        return help();
-    }
-}
-
-/**
  * リクエストのヘッダーを作成
  * @return {Object} リクエスト情報のヘッダー
  */
@@ -139,30 +127,9 @@ const createReplyRequest = (replyToken, replyMessage) => {
       'method': 'post',
       'payload': JSON.stringify({
         'replyToken': replyToken,
-        'messages': replyMessage,
+        'messages': [
+            replyMessage
+        ],
       }),
     }
   }
-
-const push = (pushMessage) => {
-
-    const options = {
-        "method" : "POST",
-        "headers" : header(),
-        "payload" : JSON.stringify(postData(pushMessage)),
-    };
-
-    UrlFetchApp.fetch(config.PUSH_URL, options);
-}
-
-const postData = (pushMessage) => {
-    return {
-        "to" : properties.getProperty('userId'),
-        "messages" : [
-            {
-                "type" : "text",
-                "text" : pushMessage,
-            }
-        ]
-      };
-}
