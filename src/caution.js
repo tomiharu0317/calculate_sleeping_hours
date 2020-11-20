@@ -1,4 +1,3 @@
-
 const caution = () => {
     let date = new Date().getDate() - 1;
 
@@ -14,7 +13,9 @@ const caution = () => {
     cautionSheet.getRange(2, 4, 1, 2).setValues([[type, consecutiveDays]]);
 
     if (type !== '健康' && consecutiveDays >= 3) {
-        push();
+        let message = '警告\n\n' + consecutiveDays.toString() + '日連続で' + type + 'の睡眠です。\n\n体に気を付けてください。';
+        let pushMessage = [[1, message]];
+        push(pushMessage);
     }
 }
 
