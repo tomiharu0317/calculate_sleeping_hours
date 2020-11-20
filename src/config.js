@@ -6,5 +6,6 @@ var properties = PropertiesService.getScriptProperties();
 const config = {
     ACCESS_TOKEN    : properties.getProperty('ACCESS_TOKEN'),
     SHEET_ID        : properties.getProperty('SHEET_ID'),
-    REPLY_URL       : 'https://api.line.me/v2/bot/message/reply'
+    REPLY_URL       : 'https://api.line.me/v2/bot/message/reply',
+    PUSH_URL        : 'https://api.line.me/v2/bot/message/push'
 };
