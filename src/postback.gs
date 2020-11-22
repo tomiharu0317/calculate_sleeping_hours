@@ -21,7 +21,7 @@ const confirmWeekly = () => {
  */
 const addRemind = () => {
 
-    return arrangeMessageFormat('リマインド追加');
+    return arrangeMessageFormat(handleLastMessage.getBeforeLast());
 }
 
 /**

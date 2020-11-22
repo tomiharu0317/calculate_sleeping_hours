@@ -59,9 +59,9 @@ const handlePostBack = (e) => {
     } else if (postbackData === 'showAll') {
         return showAllRemind();
     } else if (postbackData === 'yes') {
-        return arrangeMessageFormat(postbackData);
+        return addRemind();
     } else if (postbackData === 'no') {
-        return arrangeMessageFormat(postbackData);
+        return arrangeMessageFormat("もういちど【追加】を押し、\n「キーボードから入力してください」\nと表示されたら、入力をお願いします");
     }
 
     // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage
@@ -90,7 +90,6 @@ const convertUserMessageToReplyMessage = (flagAndMessage) => {
         return contact();
     } else {
         return finalCheck(message);
-        // return arrangeMessageFormat('finalCheck');
     }
 }
 
