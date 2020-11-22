@@ -1,5 +1,3 @@
-var properties = PropertiesService.getScriptProperties();
-
 /**
  * Postを実行する
  * @param {JSON} e
@@ -27,45 +25,60 @@ function doPost(e) {
 const handleUserMessage = (e) => {
 
     let userMessage = JSON.parse(e.postData.contents).events[0].message.text;
-    let lastMessage = properties.getProperty('lastMessage');
-    let beforeLastMessage = properties.getProperty('beforeLastMessage');
+    let eventType = JSON.parse(e.postData.contents).events[0].type;
 
-    let replyMessage = convertUserMessageToReplyMessage(messageValidation(beforeLastMessage, lastMessage, userMessage));
+    let lastMessage = handleLastMessage.getLast();
+    let lastEventType = handleEventType.getLast();
+    // let lastMessage = handleLastMessage.getBeforeLast();
+    // let lastEventType = handleEventType.getBeforeLast();
 
-    setLastMessage(userMessage);
+    let replyMessage = convertUserMessageToReplyMessage(messageValidation(lastEventType, lastMessage, userMessage));
+
+    handleLastMessage.put(userMessage);
+    handleEventType.put(eventType);
 
     return replyMessage;
 }
 
 const handlePostBack = (e) => {
     let postbackData = JSON.parse(e.postData.contents).events[0].postback.data;
-    let text;
+    let eventType = JSON.parse(e.postData.contents).events[0].type;
+
+    handleLastMessage.put(postbackData);
+    handleEventType.put(eventType);
 
     if (postbackData === 'date') {
-        text = JSON.parse(e.postData.contents).events[0].postback.params.date
-    } else {
-        text = postbackData;
+        let date = JSON.parse(e.postData.contents).events[0].postback.params.date
+        return confirmDate(date);
+    } else if (postbackData === 'weekly') {
+        return confirmWeekly();
+    } else if (postbackData === 'add') {
+        return arrangeMessageFormat('キーボードから入力してください');
+    } else if (postbackData === 'delete') {
+        return deleteRemind();
+    } else if (postbackData === 'showAll') {
+        return showAllRemind();
+    } else if (postbackData === 'yes') {
+        return arrangeMessageFormat(postbackData);
+    } else if (postbackData === 'no') {
+        return arrangeMessageFormat(postbackData);
     }
 
-    return arrangeMessageFormat(text);
-}
-
-const setLastMessage = (userMessage) => {
-    var properties = PropertiesService.getScriptProperties();
-
-    let lastMessage = properties.getProperty('lastMessage');
-
-    properties.setProperty('beforeLastMessage', lastMessage);
-    properties.setProperty('lastMessage', userMessage);
-};
+    // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage
+    // lastEventType === 'postback' && lastMessage === '' => handlepostback
+ }
 
 /**
  * ユーザーの入力メッセージからそれに対応したメッセージを返す
- * @param {String}
+ * @param {Array} - [flag, message]
  */
-const convertUserMessageToReplyMessage = (message) => {
+const convertUserMessageToReplyMessage = (flagAndMessage) => {
 
-    if (message === '起床') {
+    let [flag, message] = flagAndMessage;
+
+    if (flag === true || message === 'ヘルプ') {
+        return help();
+    } else if (message === '起床') {
         return getUp();
     } else if (message === '就寝') {
         return goToBed();
@@ -76,32 +89,45 @@ const convertUserMessageToReplyMessage = (message) => {
     } else if (message === 'お問い合わせ') {
         return contact();
     } else {
-        return help();
+        return finalCheck(message);
+        // return arrangeMessageFormat('finalCheck');
     }
 }
 
 /**
  * 入力メッセージの検証
- * @param {String} beforeLastMessage 前の前に入力されたメッセージ
+ * @param {String} lastEventType     前回のイベントタイプ(postback or text)
  * @param {String} lastMessage       前に入力されたメッセージ
  * @param {String} userMessage       入力されたメッセージ
- * @return {String}
+ * @return {Array} [flag, message]
  */
-const messageValidation = (beforeLastMessage, lastMessage, userMessage) => {
+const messageValidation = (lastEventType, lastMessage, userMessage) => {
 
   　// 全角空白を半角空白へ
   　userMessage = userMessage.replace(/　/g, ' ');
 
+    // [userMessage]
     let messageList = userMessage.split(' ');
     let messageLength = messageList.length;
+    let message;
+    let flag = false;
 
     if (messageLength > 1) {
-        return 'formatError';
+        message = 'formatError';
     } else {
-        let message = commands.includes(messageList[0]) ? messageList[0] : 'notExistCommand';
-
-        return message;
+        // userMessageがリマインド追加で促されたキーボード入力かどうか
+        if (lastEventType === 'postback' && lastMessage === 'add') {
+            message = messageList[0]
+        } else {
+            message = commands.includes(messageList[0]) ? messageList[0] : 'notExistCommand';
+        }
     }
+
+    if (message === 'formatError' || message === 'notExistCommand') {
+        flag = true;
+    }
+
+    return [flag, message];
 }
 
 /**
