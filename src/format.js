@@ -30,3 +30,15 @@ const arrangeTimeFormat = (time) => {
 
   return hour + ':' + minite;
 }
+
+/**
+ * @param {Object} flexMessage
+ */
+const arrangeFlexMessageFormat = (flexMessage) => {
+
+    return {
+        "type": "flex",
+        "altText": "This is a Flex Message",
+        "contents": flexMessage
+    };
+}

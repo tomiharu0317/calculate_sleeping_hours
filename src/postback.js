@@ -21,7 +21,7 @@ const confirmWeekly = () => {
  */
 const addRemind = () => {
 
-    return arrangeMessageFormat('リマインド追加');
+    return arrangeMessageFormat(handleLastMessage.getBeforeLast());
 }
 
 /**
@@ -48,13 +48,13 @@ const finalCheck = (message) => {
 
     let text;
 
-    if (handleLastMessage.getBeforeLast() === 'add') {
-        text = 'を追加する';
+    if (handleLastMessage.getLast() === 'add') {
+        text = 'を追加しますか？';
     } else {
-        text = 'を削除する';
+        text = 'を削除しますか？';
     }
 
-    return {
+    let obj = {
         "type": "bubble",
         "direction": "ltr",
         "header": {
@@ -63,7 +63,7 @@ const finalCheck = (message) => {
           "contents": [
             {
               "type": "text",
-              "text": "洗濯の蛇口回した？",
+              "text": message,
               "align": "center",
               "offsetTop": "20px",
               "wrap": true
@@ -111,4 +111,6 @@ const finalCheck = (message) => {
           ]
         }
       };
+
+    return arrangeFlexMessageFormat(obj);
 }

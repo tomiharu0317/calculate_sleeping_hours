@@ -29,6 +29,8 @@ const handleUserMessage = (e) => {
 
     let lastMessage = handleLastMessage.getLast();
     let lastEventType = handleEventType.getLast();
+    // let lastMessage = handleLastMessage.getBeforeLast();
+    // let lastEventType = handleEventType.getBeforeLast();
 
     let replyMessage = convertUserMessageToReplyMessage(messageValidation(lastEventType, lastMessage, userMessage));
 
@@ -57,9 +59,9 @@ const handlePostBack = (e) => {
     } else if (postbackData === 'showAll') {
         return showAllRemind();
     } else if (postbackData === 'yes') {
-        return arrangeMessageFormat(postbackData);
+        return addRemind();
     } else if (postbackData === 'no') {
-        return arrangeMessageFormat(postbackData);
+        return arrangeMessageFormat("もういちど【追加】を押し、\n「キーボードから入力してください」\nと表示されたら、入力をお願いします");
     }
 
     // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage
@@ -68,13 +70,13 @@ const handlePostBack = (e) => {
 
 /**
  * ユーザーの入力メッセージからそれに対応したメッセージを返す
- * @param {Array} [flag, message]
+ * @param {Array} - [flag, message]
  */
 const convertUserMessageToReplyMessage = (flagAndMessage) => {
 
     let [flag, message] = flagAndMessage;
 
-    if (flag || message === 'ヘルプ') {
+    if (flag === true || message === 'ヘルプ') {
         return help();
     } else if (message === '起床') {
         return getUp();
