@@ -44,10 +44,16 @@ const handleLastMessage = {
 };
 
 const handleEventType = {
-  get() {
+  getLast() {
     return properties.getProperty('lastEventType');
   },
+  getBeforeLast() {
+    return properties.getProperty('beforeLastEventType');
+  },
   put(eventType) {
+    let lastEventType = properties.getProperty('lastEventType');
+
+    properties.setProperty('beforeLastEventType', lastEventType);
     properties.setProperty('lastEventType', eventType);
   }
 }
