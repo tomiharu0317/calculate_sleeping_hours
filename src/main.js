@@ -30,7 +30,9 @@ const handleUserMessage = (e) => {
     let lastMessage = handleLastMessage.getLast();
     let beforeLastMessage = handleLastMessage.getBeforeLast();
 
-    let replyMessage = convertUserMessageToReplyMessage(messageValidation(beforeLastMessage, lastMessage, userMessage));
+    let lastEventType = handleEventType.getLast();
+
+    let replyMessage = convertUserMessageToReplyMessage(messageValidation(lastEventType, lastMessage, userMessage));
 
     handleLastMessage.put(userMessage);
     handleEventType.put(eventType);
@@ -51,24 +53,28 @@ const handlePostBack = (e) => {
     } else if (postbackData === 'weekly') {
         return confirmWeekly();
     } else if (postbackData === 'add') {
-        return addRemind();
+        return arrangeMessageFormat('キーボードから入力してください');
     } else if (postbackData === 'delete') {
         return deleteRemind();
     } else if (postbackData === 'showAll') {
         return showAllRemind();
     }
 
-    // lastEventType === 'postback' && lastMessage === 'リマインド追加' => handleUserMessage
-    // lastEventType === 'postback' && lastMessage === 'リマインド削除' => handlepostback
+    // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage
+    // lastEventType === 'postback' && lastMessage === '' => handlepostback
  }
 
 /**
  * ユーザーの入力メッセージからそれに対応したメッセージを返す
- * @param {String}
+ * @param {Array} [flag, message]
  */
-const convertUserMessageToReplyMessage = (message) => {
+const convertUserMessageToReplyMessage = (flagAndMessage) => {
 
-    if (message === '起床') {
+    let [flag, message] = flagAndMessage;
+
+    if (flag || message === 'ヘルプ') {
+        return help();
+    } else if (message === '起床') {
         return getUp();
     } else if (message === '就寝') {
         return goToBed();
@@ -79,32 +85,42 @@ const convertUserMessageToReplyMessage = (message) => {
     } else if (message === 'お問い合わせ') {
         return contact();
     } else {
-        return help();
+        return addRemind(message);
     }
 }
 
 /**
  * 入力メッセージの検証
- * @param {String} beforeLastMessage 前の前に入力されたメッセージ
+ * @param {String} lastEventType     前回のイベントタイプ(postback or text)
  * @param {String} lastMessage       前に入力されたメッセージ
  * @param {String} userMessage       入力されたメッセージ
- * @return {String}
+ * @return {Array} [flag, message]
  */
-const messageValidation = (beforeLastMessage, lastMessage, userMessage) => {
+const messageValidation = (lastEventType, lastMessage, userMessage) => {
 
   　// 全角空白を半角空白へ
   　userMessage = userMessage.replace(/　/g, ' ');
 
     let messageList = userMessage.split(' ');
     let messageLength = messageList.length;
+    let message;
+    let help = false;
 
     if (messageLength > 1) {
-        return 'formatError';
+        message = 'formatError';
     } else {
-        let message = commands.includes(messageList[0]) ? messageList[0] : 'notExistCommand';
-
-        return message;
+        if (lastEventType === 'postback' && lastMessage === 'add') {
+            message = messageList[0]
+        } else {
+            message = commands.includes(messageList[0]) ? messageList[0] : 'notExistCommand';
+        }
     }
+
+    if (message === 'formatError' || message === 'notExistCommand') {
+        help = true;
+    }
+
+    return [flag, message];
 }
 
 /**
