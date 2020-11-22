@@ -17,7 +17,7 @@ const confirmWeekly = () => {
 }
 
 /**
- * 次のpostbackで設定
+ * messageを受け取って設定
  */
 const addRemind = () => {
 
@@ -38,4 +38,77 @@ const deleteRemind = () => {
 const showAllRemind = () => {
 
     return arrangeMessageFormat('リマインド一覧');
+}
+
+/**
+ * messageを削除/追加していいか確認
+ * @param {String} message
+ */
+const finalCheck = (message) => {
+
+    let text;
+
+    if (handleLastMessage.getBeforeLast() === 'add') {
+        text = 'を追加する';
+    } else {
+        text = 'を削除する';
+    }
+
+    return {
+        "type": "bubble",
+        "direction": "ltr",
+        "header": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": "洗濯の蛇口回した？",
+              "align": "center",
+              "offsetTop": "20px",
+              "wrap": true
+            }
+          ]
+        },
+        "body": {
+          "type": "box",
+          "layout": "vertical",
+          "contents": [
+            {
+              "type": "text",
+              "text": text,
+              "align": "center",
+              "offsetTop": "10px"
+            }
+          ],
+          "height": "70px"
+        },
+        "footer": {
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "data": "yes",
+                "label": "はい"
+              },
+              "color": "#1dcd00",
+              "style": "primary"
+            },
+            {
+              "type": "button",
+              "action": {
+                "type": "postback",
+                "label": "いいえ",
+                "data": "no"
+              },
+              "style": "primary",
+              "color": "#f02011",
+              "margin": "10px"
+            }
+          ]
+        }
+      };
 }

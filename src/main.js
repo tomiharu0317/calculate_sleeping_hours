@@ -28,8 +28,6 @@ const handleUserMessage = (e) => {
     let eventType = JSON.parse(e.postData.contents).events[0].type;
 
     let lastMessage = handleLastMessage.getLast();
-    let beforeLastMessage = handleLastMessage.getBeforeLast();
-
     let lastEventType = handleEventType.getLast();
 
     let replyMessage = convertUserMessageToReplyMessage(messageValidation(lastEventType, lastMessage, userMessage));
@@ -58,6 +56,10 @@ const handlePostBack = (e) => {
         return deleteRemind();
     } else if (postbackData === 'showAll') {
         return showAllRemind();
+    } else if (postbackData === 'yes') {
+        return arrangeMessageFormat(postbackData);
+    } else if (postbackData === 'no') {
+        return arrangeMessageFormat(postbackData);
     }
 
     // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage
@@ -85,7 +87,7 @@ const convertUserMessageToReplyMessage = (flagAndMessage) => {
     } else if (message === 'お問い合わせ') {
         return contact();
     } else {
-        return addRemind(message);
+        return finalCheck(message);
     }
 }
 
@@ -101,14 +103,16 @@ const messageValidation = (lastEventType, lastMessage, userMessage) => {
   　// 全角空白を半角空白へ
   　userMessage = userMessage.replace(/　/g, ' ');
 
+    // [userMessage]
     let messageList = userMessage.split(' ');
     let messageLength = messageList.length;
     let message;
-    let help = false;
+    let flag = false;
 
     if (messageLength > 1) {
         message = 'formatError';
     } else {
+        // userMessageがリマインド追加で促されたキーボード入力かどうか
         if (lastEventType === 'postback' && lastMessage === 'add') {
             message = messageList[0]
         } else {
@@ -117,7 +121,7 @@ const messageValidation = (lastEventType, lastMessage, userMessage) => {
     }
 
     if (message === 'formatError' || message === 'notExistCommand') {
-        help = true;
+        flag = true;
     }
 
     return [flag, message];
