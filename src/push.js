@@ -2,7 +2,7 @@
  * 1:text, 2:img
  * 1:[type, text]
  * 2:[type, originalContentUrl, previewImageUrl]
- * @param {Array} pushMessage - メッセージのオプションが入った最長2の二重配列
+ * @param {Array} pushMessage - メッセージのオプションが入った最長2の二重配列 [[type, option]]
  */
 const push = (pushMessage) => {
 
@@ -15,18 +15,26 @@ const push = (pushMessage) => {
     UrlFetchApp.fetch(config.PUSH_URL, options);
 }
 
+/**
+ * @param {Array} pushMessage - メッセージのオプションが入った最長2(週間報告の時)の二重配列 [[type, option]]
+ * @return {Object} messages[ ここ ]
+ */
 const postData = (pushMessage) => {
 
+    var properties = PropertiesService.getScriptProperties();
+
     let messages = [];
-    let list, message;
+    let messageList, message;
 
     for (let i = 0; i < pushMessage.length; i++) {
-        list = pushMessage[i];
 
-        if (list[i] === 1) {
-            message = arrangeMessageFormat(list[1]);
+        // [type, option]
+        messageList = pushMessage[i];
+
+        if (messageList[0] === 1) {
+            message = arrangeMessageFormat(messageList[1]);
         } else {
-            message = arrangeImageFormat(list[1], list[2]);
+            message = arrangeImageFormat(messageList[1], messageList[2]);
         }
 
         messages.push(message);
