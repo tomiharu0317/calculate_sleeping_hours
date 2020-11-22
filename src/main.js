@@ -1,5 +1,3 @@
-var properties = PropertiesService.getScriptProperties();
-
 /**
  * Postを実行する
  * @param {JSON} e
@@ -27,37 +25,42 @@ function doPost(e) {
 const handleUserMessage = (e) => {
 
     let userMessage = JSON.parse(e.postData.contents).events[0].message.text;
-    let lastMessage = properties.getProperty('lastMessage');
-    let beforeLastMessage = properties.getProperty('beforeLastMessage');
+    let eventType = JSON.parse(e.postData.contents).events[0].type;
+
+    let lastMessage = handleLastMessage.getLast();
+    let beforeLastMessage = handleLastMessage.getBeforeLast();
 
     let replyMessage = convertUserMessageToReplyMessage(messageValidation(beforeLastMessage, lastMessage, userMessage));
 
-    setLastMessage(userMessage);
+    handleLastMessage.put(userMessage);
+    handleEventType.put(eventType);
 
     return replyMessage;
 }
 
 const handlePostBack = (e) => {
     let postbackData = JSON.parse(e.postData.contents).events[0].postback.data;
-    let text;
+    let eventType = JSON.parse(e.postData.contents).events[0].type;
+
+    handleLastMessage.put(postbackData);
+    handleEventType.put(eventType);
 
     if (postbackData === 'date') {
-        text = JSON.parse(e.postData.contents).events[0].postback.params.date
-    } else {
-        text = postbackData;
+        let date = JSON.parse(e.postData.contents).events[0].postback.params.date
+        return confirmDate(date);
+    } else if (postbackData === 'weekly') {
+        return confirmWeekly();
+    } else if (postbackData === 'add') {
+        return addRemind();
+    } else if (postbackData === 'delete') {
+        return deleteRemind();
+    } else if (postbackData === 'showAll') {
+        return showAllRemind();
     }
 
-    return arrangeMessageFormat(text);
-}
-
-const setLastMessage = (userMessage) => {
-    var properties = PropertiesService.getScriptProperties();
-
-    let lastMessage = properties.getProperty('lastMessage');
-
-    properties.setProperty('beforeLastMessage', lastMessage);
-    properties.setProperty('lastMessage', userMessage);
-};
+    // lastEventType === 'postback' && lastMessage === 'リマインド追加' => handleUserMessage
+    // lastEventType === 'postback' && lastMessage === 'リマインド削除' => handlepostback
+ }
 
 /**
  * ユーザーの入力メッセージからそれに対応したメッセージを返す
