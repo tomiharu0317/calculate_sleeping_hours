@@ -1,14 +1,3 @@
-const testSetAsPreviousMessage = () => {
-
-    setAsPreviousMessage('確認');
-    // setAsPreviousMessage('');
-    // setAsPreviousMessage('');
-    // setAsPreviousMessage('');
-
-    console.log('');
-}
-
-
 const testIsSleep = () => {
 
     console.log(isSleep.get()); // true
