@@ -48,3 +48,67 @@ const arrangeRemindFormat = (remind) => {
     wrap: true,
   };
 };
+
+/**
+ * おかしな時間で計測された(spreadsheetの仕様)時間を整形して吐く
+ * @param {String} sleepingTimes
+ * @return {String} 'HH:MM'
+ */
+const arrangeRecordedSleepiingTimeFormat = (sleepingTimes) => {
+  // date型を文字列にしたやつで持ってくるからsplit()できない [ [ Sat Dec 30 1899 12:34:00 GMT+0900 (日本標準時) ] ]
+  sleepingTimes = new Date(sleepingTimes);
+
+  let hours = sleepingTimes.getHours();
+  let minutes = sleepingTimes.getMinutes();
+
+  return (
+    hours.toString().padStart(2, '0') +
+    ':' +
+    minutes.toString().padStart(2, '0')
+  );
+};
+
+/**
+ * [['就寝', 'date'], ['起床', 'date'], ['睡眠時間', 'date']]をObjにして返す
+ * @param {Array} sleepRecord
+ * @param {Number} recordIndex 何回目の睡眠か
+ */
+const arrangeSleepingRecordToObj = (sleepRecord, recordIndex) => {
+  let sleepRecordObj = {
+    type: 'box',
+    layout: 'vertical',
+    contents: [
+      {
+        type: 'text',
+        text: recordIndex.toString() + '.',
+      },
+    ],
+    height: '110px',
+  };
+
+  let text, time, obj;
+
+  for (let i = 0; i < 3; i++) {
+    text = sleepRecord[i][0];
+    time = arrangeRecordedSleepiingTimeFormat(sleepRecord[i][1]);
+
+    obj = {
+      type: 'box',
+      layout: 'horizontal',
+      contents: [
+        {
+          type: 'text',
+          text: text,
+        },
+        {
+          type: 'text',
+          text: time,
+        },
+      ],
+    };
+
+    sleepRecordObj.contents.push(obj);
+  }
+
+  return sleepRecordObj;
+};
