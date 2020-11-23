@@ -79,7 +79,7 @@ const goToBed = () => {
     text = 'おやすみなさい💤';
   }
 
-  return arrangeMessageFormat(text);
+  return [showAllRemind(), arrangeMessageFormat(text)];
 };
 
 /**
