@@ -34,7 +34,55 @@ const deleteRemind = () => {
  * リマインド一覧を表示
  */
 const showAllRemind = () => {
-  return arrangeMessageFormat('リマインド一覧');
+  let lastRow = remindSheet.getLastRow();
+
+  if (lastRow === 1) {
+    return arrangeMessageFormat('現在登録されているリマインドはありません');
+  }
+
+  let remindListObj = {
+    type: 'bubble',
+    hero: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [],
+    },
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [
+        {
+          type: 'text',
+          text: 'リマインド一覧',
+          size: '18px',
+          weight: 'bold',
+          margin: '10px',
+        },
+      ],
+    },
+  };
+
+  // [['リマインド'], ['リマインド2']];
+  let remindList = remindSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  remindListObj = addRemindToRemindListObj(remindListObj, remindList);
+  return arrangeFlexMessageFormat(remindListObj);
+};
+
+/**
+ * リマインドリストからひとつひとつをobjに整形してremindListObjに入れる
+ * @param {Object} remindListObj
+ * @param {Array} remindList
+ */
+const addRemindToRemindListObj = (remindListObj, remindList) => {
+  let remind, obj;
+  for (let i = 0; i < remindList.length; i++) {
+    remind = remindList[i][0];
+    obj = arrangeRemindFormat(remind);
+
+    remindListObj.body.contents.push(obj);
+  }
+
+  return remindListObj;
 };
 
 /**
