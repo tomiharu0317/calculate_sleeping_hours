@@ -59,7 +59,7 @@ const handlePostBack = (e) => {
     } else if (postbackData === 'showAll') {
         return showAllRemind();
     } else if (postbackData === 'yes') {
-        return addRemind();
+        return addRemind(handleLastMessage.getBeforeLast());
     } else if (postbackData === 'no') {
         return arrangeMessageFormat("もういちど【追加】を押し、\n「キーボードから入力してください」\nと表示されたら、入力をお願いします");
     }
