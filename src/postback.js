@@ -104,7 +104,9 @@ const addSleepingTimesToObj = (sleepingTimesObj, recordNum, targetColumn) => {
  * 過去7日間の睡眠時間とグラフを返す
  */
 const confirmWeekly = () => {
-  return arrangeMessageFormat('確認週間');
+  const date = new Date();
+  const weeklyReportObj = fetchWeekSleepingTime(date.getDay(), date.getDate());
+  return arrangeFlexMessageFormat(weeklyReportObj);
 };
 
 /**
