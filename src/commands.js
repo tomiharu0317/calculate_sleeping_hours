@@ -168,8 +168,7 @@ const remind = () => {
  * お問い合わせ用のGoogle Form URLを送信する関数
  */
 const contact = () => {
-  let text =
-    'こちらのフォームからお問い合わせ下さい。（レビュー、使いにくい点など）';
+  let text = '現在対応しておりません';
   return arrangeMessageFormat(text);
 };
 
@@ -177,6 +176,24 @@ const contact = () => {
  * ヘルプを表示する関数
  */
 const help = () => {
-  let text = 'ヘルプ';
-  return arrangeMessageFormat(text);
+  let link = {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [
+        {
+          type: 'button',
+          action: {
+            type: 'uri',
+            label: 'ヘルプ',
+            uri: 'https://github.com/tomiharu0317/calculate_sleeping_hours',
+          },
+          style: 'primary',
+        },
+      ],
+    },
+  };
+
+  return arrangeFlexMessageFormat(link);
 };
