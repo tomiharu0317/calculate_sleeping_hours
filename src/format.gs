@@ -35,7 +35,7 @@ const arrangeTimeFormat = (time) => {
 const arrangeFlexMessageFormat = (flexMessage) => {
   return {
     type: 'flex',
-    altText: 'another flex message passing by...',
+    altText: 'Flex message',
     contents: flexMessage,
   };
 };
