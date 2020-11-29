@@ -60,15 +60,24 @@ const handlePostBack = (e) => {
   } else if (postbackData === 'add') {
     return arrangeMessageFormat('キーボードから入力してください');
   } else if (postbackData === 'delete') {
-    return deleteRemind();
+    return selectWantToDeleteRemind();
   } else if (postbackData === 'showAll') {
     return showAllRemind();
-  } else if (postbackData === 'yes') {
+  } else if (
+    postbackData === 'yes' &&
+    handleEventType.getBeforeLast() === 'message'
+  ) {
+    // リマインド削除 || リマインド追加
     return addRemind(handleLastMessage.getBeforeLast());
+  } else if (
+    postbackData === 'yes' &&
+    handleEventType.getBeforeLast() === 'postback'
+  ) {
+    return deleteRemind(handleLastMessage.getBeforeLast());
   } else if (postbackData === 'no') {
-    return arrangeMessageFormat(
-      'もういちど【追加】を押し、\n「キーボードから入力してください」\nと表示されたら、入力をお願いします'
-    );
+    return arrangeMessageFormat('キャンセルされました');
+  } else {
+    return finalCheck(handleLastMessage.getLast());
   }
 
   // lastEventType === 'postback' && lastMessage === 'add' => handleUserMessage

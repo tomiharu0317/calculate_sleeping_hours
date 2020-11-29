@@ -35,7 +35,7 @@ const arrangeTimeFormat = (time) => {
 const arrangeFlexMessageFormat = (flexMessage) => {
   return {
     type: 'flex',
-    altText: 'This is a Flex Message',
+    altText: 'another flex message passing by...',
     contents: flexMessage,
   };
 };
@@ -46,6 +46,35 @@ const arrangeRemindFormat = (remind) => {
     text: '・' + remind,
     margin: '10px',
     wrap: true,
+  };
+};
+
+const wantToDeleteRemindFormat = (remind, index) => {
+  return {
+    type: 'box',
+    layout: 'horizontal',
+    contents: [
+      {
+        type: 'text',
+        text: remind,
+        gravity: 'center',
+        wrap: true,
+      },
+      {
+        type: 'button',
+        action: {
+          type: 'postback',
+          label: '選択',
+          data: index + '. ' + remind,
+        },
+        style: 'primary',
+        height: 'sm',
+        margin: '30px',
+        gravity: 'center',
+        adjustMode: 'shrink-to-fit',
+      },
+    ],
+    height: '70px',
   };
 };
 

@@ -122,8 +122,58 @@ const addRemind = (remindMessage) => {
 /**
  * リマインド一覧と削除ボタンをflex messageで返す
  */
-const deleteRemind = () => {
-  return arrangeMessageFormat('リマインド削除');
+const selectWantToDeleteRemind = () => {
+  let lastRow = remindSheet.getLastRow();
+
+  if (lastRow === 1) {
+    return arrangeMessageFormat('現在登録されているリマインドはありません');
+  }
+
+  let remindListObj = {
+    type: 'bubble',
+    header: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [
+        {
+          type: 'text',
+          text: '削除するリマインドを選択してください',
+          wrap: true,
+          weight: 'bold',
+          size: '14px',
+        },
+      ],
+      height: '70px',
+    },
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [],
+    },
+  };
+
+  // セレクトボタンに必要な情報=>[何番目か]
+  // [['リマインド'], ['リマインド2']];
+  let remindList = remindSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  remindListObj = addRemindToRemindListObj(remindListObj, remindList, 2);
+  return arrangeFlexMessageFormat(remindListObj);
+};
+
+/**
+ * 削除して空行埋めて入れ直す
+ * @param {String} deleteMessage
+ */
+const deleteRemind = (deleteMessage) => {
+  let [index, deleteRemind] = deleteMessage.split('. ');
+  let lastRow = remindSheet.getLastRow();
+  let values = remindSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+
+  values.splice(Number(index) - 1, 1);
+  values.push(['']);
+
+  remindSheet.getRange(2, 1, lastRow - 1, 1).setValues(values);
+
+  return arrangeMessageFormat(deleteRemind + '\n\nを削除しました');
 };
 
 /**
@@ -160,7 +210,7 @@ const showAllRemind = () => {
 
   // [['リマインド'], ['リマインド2']];
   let remindList = remindSheet.getRange(2, 1, lastRow - 1, 1).getValues();
-  remindListObj = addRemindToRemindListObj(remindListObj, remindList);
+  remindListObj = addRemindToRemindListObj(remindListObj, remindList, 1);
   return arrangeFlexMessageFormat(remindListObj);
 };
 
@@ -168,12 +218,18 @@ const showAllRemind = () => {
  * リマインドリストからひとつひとつをobjに整形してremindListObjに入れる
  * @param {Object} remindListObj
  * @param {Array} remindList
+ * @param {Number} type [showall, delete]
  */
-const addRemindToRemindListObj = (remindListObj, remindList) => {
-  let remind, obj;
+const addRemindToRemindListObj = (remindListObj, remindList, type) => {
+  let remind, obj, index;
   for (let i = 0; i < remindList.length; i++) {
     remind = remindList[i][0];
-    obj = arrangeRemindFormat(remind);
+    if (type === 1) {
+      obj = arrangeRemindFormat(remind);
+    } else {
+      index = (i + 1).toString();
+      obj = wantToDeleteRemindFormat(remind, index);
+    }
 
     remindListObj.body.contents.push(obj);
   }
