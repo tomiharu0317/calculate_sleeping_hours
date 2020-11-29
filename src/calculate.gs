@@ -1,6 +1,5 @@
 const calcTotalSleepingHours = (sleepingHours, recordNum, targetColumn) => {
 
-  
   if (recordNum === 0) {
     return sleepingHours;
   } else {
