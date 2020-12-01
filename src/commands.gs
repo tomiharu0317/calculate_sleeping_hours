@@ -18,7 +18,6 @@ const getUp = () => {
   if (isSleep.get() === 'false') {
     text = '既に起床後です';
   } else {
-    isSleep.put(false);
     gotobedTime = new Date(bedtime.get());
     getupTime = new Date();
 
@@ -57,6 +56,8 @@ const getUp = () => {
     cautionSheet.getRange(new Date().getDate(), 2).setValues(cautionValues);
 
     text = 'おはようございます\n\n睡眠時間は' + sleepingHours + 'でした';
+
+    isSleep.put(false);
   }
 
   return arrangeMessageFormat(text);
